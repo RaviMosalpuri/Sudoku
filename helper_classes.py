@@ -130,22 +130,55 @@ class SudokuApp:
 
     def update_mistakes(self):
         """
-        Updates the number of mistakes.
+        Updates the number of mistakes and handles the game-over scenario.
         """
         self.mistakes += 1
         self.mistakes_label.config(text=f"Mistakes: {self.mistakes}/3")
 
+        if self.mistakes >= 3:
+            self.game_over()
+
+
+    def game_over(self):
+        """
+        Handles the game-over logic, including UI updates and returning to the main menu.
+        """
+        # Stop the timer
+        if hasattr(self, 'timer_id') and self.timer_id:
+            self.root.after_cancel(self.timer_id)
+            self.timer_id = None
+
+        messagebox.showinfo("Game Over", "You've made 3 mistakes. Game Over!")
+        self.disable_all_inputs()
+
+        # Destroy widgets and return to main menu
+        for widget in self.root.winfo_children():
+            widget.destroy()
+        self.main_menu()
+
+
+    def disable_all_inputs(self):
+        """
+        Disables all input fields in the Sudoku grid.
+        """
+        for row in self.entries:
+            for entry in row:
+                if entry["state"] != "disabled":
+                    entry.config(state="disabled")
+
 
     def update_timer(self):
         """
-        Updates the timer label for the game.
+        Updates the timer and schedules the next timer tick.
         """
         if self.timer_running:
             self.elapsed_time += 1
             minutes = self.elapsed_time // 60
             seconds = self.elapsed_time % 60
             self.timer_label.config(text=f"Time: {minutes}:{seconds:02}")
-            self.root.after(1000, self.update_timer)
+
+            # Schedule the next update and store the ID
+            self.timer_id = self.root.after(1000, self.update_timer)
 
 
     def solve(self):
