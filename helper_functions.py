@@ -1,6 +1,7 @@
 import numpy as np
 import random
 
+
 def is_valid(sudoku, r, c, val):
     for row in range(9):
         if sudoku[row][c] == val:
@@ -15,6 +16,7 @@ def is_valid(sudoku, r, c, val):
             if sudoku[row][col] == val:
                 return False
     return True
+
 
 def solve_sudoku(sudoku, row, col):
     if row == 8 and col == 9:
@@ -31,6 +33,7 @@ def solve_sudoku(sudoku, row, col):
                 return True
         sudoku[row][col] = 0
     return False
+
 
 def generate_sudoku(level=0):
     sudoku = [[0 for _ in range(9)] for _ in range(9)]

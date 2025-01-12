@@ -4,6 +4,7 @@ from copy import deepcopy
 
 import helper_functions
 
+
 class SudokuApp:
     """
     Sudoku game class.
@@ -13,6 +14,7 @@ class SudokuApp:
         self.root.title("Sudoku")
         self.timer_running = False
         self.elapsed_time = 0
+        self.mistakes = 0
         self.main_menu()
         self.root.mainloop()
 
@@ -67,12 +69,16 @@ class SudokuApp:
 
         # Reset the timer
         self.elapsed_time = 0
+        self.mistakes = 0
         self.timer_running = True
 
         # Create the timer label
         self.timer_label = tk.Label(self.root, text="Time: 0:00", font=("Arial", 14))
-        self.timer_label.grid(row=0, column=0, columnspan=9, pady=10)
+        self.timer_label.grid(row=0, column=0, columnspan=2, pady=10)
         self.update_timer()
+
+        self.mistakes_label = tk.Label(self.root, text="Mistakes: 0/3", font=("Arial", 14))
+        self.mistakes_label.grid(row=0, column=5, columnspan=10, pady=10)
 
         # Create the Sudoku grid
         self.entries = [[None for _ in range(9)] for _ in range(9)]
@@ -89,6 +95,7 @@ class SudokuApp:
                         if self.sudoku[r][c] != 0:
                             entry.insert(0, str(self.sudoku[r][c]))
                             entry.config(state="disabled", disabledforeground="black")
+                        entry.bind('<KeyRelease>', lambda event, e=entry, r=r, c=c: self.is_entry_valid(e, r, c))
                         self.entries[r][c] = entry
 
 
@@ -101,6 +108,32 @@ class SudokuApp:
 
         menu_button = tk.Button(self.root, text="Main Menu", command=self.return_to_menu)
         menu_button.grid(row=11, column=0, columnspan=9, pady=10)
+
+
+    def is_entry_valid(self, entry, row, col):
+        """
+        Function to update the background color of any entry based on if it's empty, correct and incorrect.
+
+        Parameters:
+        entry : entry
+        row : row number
+        col : column number
+        """
+        if entry.get() == '0' or entry.get() == '':
+            entry.config(bg='white')
+        elif int(entry.get()) != self.sudoku_solved[row][col]:
+            entry.config(bg='red')
+            self.update_mistakes()
+        else:
+            entry.config(bg='white')
+
+
+    def update_mistakes(self):
+        """
+        Updates the number of mistakes.
+        """
+        self.mistakes += 1
+        self.mistakes_label.config(text=f"Mistakes: {self.mistakes}/3")
 
 
     def update_timer(self):
