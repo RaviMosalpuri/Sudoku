@@ -1,5 +1,3 @@
-Sure! Here's a README file for your Sudoku game:
-
 # Sudoku Game
 
 This is a simple Sudoku game implemented using Python and Tkinter. The game allows users to select difficulty levels, solve puzzles, and reset the board.
