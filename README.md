@@ -6,9 +6,9 @@ This is a simple Sudoku game implemented using Python and Tkinter. The game allo
 
 - Three difficulty levels: Easy, Medium, and Hard
 - Timer to track the time taken to solve the puzzle
+- Mistakes count to track mistakes made, maximum 2 can be made during the game
 - Solve button to automatically solve the puzzle
 - Reset button to clear the board
-- Main Menu button to return to the main menu
 
 ## Requirements
 
