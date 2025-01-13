@@ -13,11 +13,11 @@ class SudokuApp:
         self.elapsed_time = 0
         self.mistakes = 0
         self.board = None
-        self.main_menu()
+        self.__main_menu()
         self.root.mainloop()
 
 
-    def main_menu(self):
+    def __main_menu(self):
         """Main menu for the game."""
         # Clear the current window
         for widget in self.root.winfo_children():
@@ -29,10 +29,10 @@ class SudokuApp:
 
         # Difficulty buttons
         for difficulty, text in enumerate(["Easy", "Medium", "Hard"]):
-            tk.Button(self.root, text=text, font=("Arial", 14), command=lambda d=difficulty: self.start_game(d)).pack(pady=5)
+            tk.Button(self.root, text=text, font=("Arial", 14), command=lambda d=difficulty: self.__start_game(d)).pack(pady=5)
 
 
-    def start_game(self, difficulty):
+    def __start_game(self, difficulty):
         """Start a new game."""
         # Clear the current window
         for widget in self.root.winfo_children():
@@ -55,19 +55,19 @@ class SudokuApp:
         # Add control buttons
         tk.Button(self.root, text="Solve", command=self.board.solve_board).grid(row=10, column=0, columnspan=3, pady=10)
         tk.Button(self.root, text="Reset", command=self.board.reset_board).grid(row=10, column=3, columnspan=3, pady=10)
-        tk.Button(self.root, text="Main Menu", command=self.return_to_menu).grid(row=11, column=0, columnspan=9, pady=10)
+        tk.Button(self.root, text="Main Menu", command=self.__return_to_menu).grid(row=11, column=0, columnspan=9, pady=10)
 
         # Start the timer
-        self.update_timer()
+        self.__update_timer()
 
 
-    def update_timer(self):
+    def __update_timer(self):
         """Update the timer every second."""
         if self.timer_running:
             self.elapsed_time += 1
             minutes, seconds = divmod(self.elapsed_time, 60)
             self.timer_label.config(text=f"Time: {minutes}:{seconds:02}")
-            self.root.after(1000, self.update_timer)
+            self.root.after(1000, self.__update_timer)
 
 
     def update_mistakes(self):
@@ -75,21 +75,21 @@ class SudokuApp:
         self.mistakes += 1
         self.mistakes_label.config(text=f"Mistakes: {self.mistakes}/3")
         if self.mistakes >= 3:
-            self.game_over()
+            self.__game_over()
 
 
-    def game_over(self):
+    def __game_over(self):
         """Handle game-over logic."""
         self.timer_running = False
         messagebox.showinfo("Game Over", "You've made 3 mistakes. Game Over!")
         self.board.disable_all_inputs()
-        self.return_to_menu()
+        self.__return_to_menu()
 
 
-    def return_to_menu(self):
+    def __return_to_menu(self):
         """Return to the main menu."""
         self.timer_running = False
-        self.main_menu()
+        self.__main_menu()
 
 
 class SudokuBoard:
@@ -100,13 +100,13 @@ class SudokuBoard:
         self.sudoku = None
         self.sudoku_solved = None
         self.entries = [[None for _ in range(9)] for _ in range(9)]
-        self.generate_board()
+        self.__generate_board()
 
 
-    def generate_board(self):
+    def __generate_board(self):
         """Generate a Sudoku puzzle and display it on the board."""
         # Generate puzzle
-        self.generate_sudoku(self.difficulty)
+        self.__generate_random_sudoku(self.difficulty)
 
         # Create Sudoku grid
         for box_row in range(3):
@@ -122,11 +122,11 @@ class SudokuBoard:
                             entry.insert(0, str(self.sudoku[r][c]))
                             entry.config(state="disabled", disabledforeground="black")
                         else:
-                            entry.bind('<KeyRelease>', lambda _, e=entry, r=r, c=c: self.is_entry_valid(e, r, c))
+                            entry.bind('<KeyRelease>', lambda _, e=entry, r=r, c=c: self.__is_entry_valid(e, r, c))
                         self.entries[r][c] = entry
 
 
-    def is_valid(self, sudoku, r, c, val):
+    def __is_number_valid(self, sudoku, r, c, val):
         for row in range(9):
             if sudoku[row][c] == val:
                 return False
@@ -142,24 +142,24 @@ class SudokuBoard:
         return True
 
 
-    def solve_sudoku(self, sudoku, row, col):
+    def __solve_sudoku(self, sudoku, row, col):
         if row == 8 and col == 9:
             return True
         if col == 9:
             row += 1
             col = 0
         if sudoku[row][col] != 0:
-            return self.solve_sudoku(sudoku, row, col + 1)
+            return self.__solve_sudoku(sudoku, row, col + 1)
         for val in range(1, 10):
-            if self.is_valid(sudoku, row, col, val):
+            if self.__is_number_valid(sudoku, row, col, val):
                 sudoku[row][col] = val
-                if self.solve_sudoku(sudoku, row, col + 1):
+                if self.__solve_sudoku(sudoku, row, col + 1):
                     return True
             sudoku[row][col] = 0
         return False
 
 
-    def generate_sudoku(self, level=0):
+    def __generate_random_sudoku(self, level=0):
         self.sudoku = [[0 for _ in range(9)] for _ in range(9)]
         for i in range(0, 9, 3):
             nums = np.random.choice(np.arange(1, 10), 9, replace=False).tolist()
@@ -167,7 +167,7 @@ class SudokuBoard:
                 for col in range(3):
                     self.sudoku[row + i][col + i] = nums.pop()
         
-        self.solve_sudoku(self.sudoku, 0, 0)
+        self.__solve_sudoku(self.sudoku, 0, 0)
         self.sudoku_solved = deepcopy(self.sudoku)
         
         if level == 0:
@@ -176,12 +176,13 @@ class SudokuBoard:
             num_empty_cells = random.randint(37, 41)
         else:
             num_empty_cells = random.randint(42, 46)
+        
         for _ in range(num_empty_cells):
             row, col = random.randint(0, 8), random.randint(0, 8)
             self.sudoku[row][col] = 0
 
 
-    def is_entry_valid(self, entry, row, col):
+    def __is_entry_valid(self, entry, row, col):
         """
         Function to update the background color of any entry based on if it's empty, correct and incorrect.
 
