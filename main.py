@@ -1,4 +1,4 @@
-from helper_classes import SudokuApp
+from sudoku_app import SudokuApp
 
 
 if __name__ == "__main__":
