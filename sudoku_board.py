@@ -29,12 +29,20 @@ class SudokuBoard:
         # Generate puzzle
         self.__generate_random_sudoku(self.difficulty)
 
+        # Configure grid to center the board
+        for i in range(9):
+            self.root.grid_columnconfigure(i, weight=1)
+        
+        # Create main frame to hold the entire board
+        main_frame = tk.Frame(self.root)
+        main_frame.grid(row=1, column=0, columnspan=9, pady=20)
+
         # Create Sudoku grid
         for box_row in range(3):
             for box_col in range(3):
                 # Create a frame for the box
-                frame = tk.Frame(self.root, highlightbackground="black", highlightthickness=1)
-                frame.grid(row=box_row * 3 + 1, column=box_col * 3, rowspan=3, columnspan=3, padx=1, pady=1)
+                frame = tk.Frame(main_frame, highlightbackground="black", highlightthickness=1)
+                frame.grid(row=box_row * 3, column=box_col * 3, rowspan=3, columnspan=3, padx=1, pady=1)
                 # Loop over the small box
                 for row in range(3):
                     for col in range(3):
