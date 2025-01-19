@@ -9,6 +9,7 @@ This is a simple Sudoku game implemented using Python and Tkinter. The game allo
 - Mistakes count to track mistakes made, maximum 2 can be made during the game
 - Solve button to automatically solve the puzzle
 - Reset button to clear the board
+- Statistics of all the levels: number of games played, games won, win rate and average time
 
 ## Requirements
 
