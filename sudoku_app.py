@@ -223,8 +223,8 @@ class SudokuApp:
             Games Played: {stats['games_played']}
             Games Won: {stats['games_won']}
             Win Rate: {(stats['games_won'] / stats['games_played'] * 100 if stats['games_played'] > 0 else 0):.1f}%
-            Best Time: {int(stats['best_time']) if stats['best_time'] != float('inf') else 'N/A'} seconds
-            Average Time: {int(stats['average_time']) if stats['average_time'] > 0 else 'N/A'} seconds
+            Best Time: {str(int(stats['best_time'])) + " seconds" if stats['best_time'] != float('inf') else 'N/A'}
+            Average Time: {str(int(stats['average_time'])) + " seconds" if stats['average_time'] > 0 else 'N/A'}
             """
             stats_label.config(text=stats_text)
 
@@ -334,7 +334,7 @@ class SudokuApp:
             # Convert float('inf') to "inf" string for JSON serialization
             for difficulty in ['easy', 'medium', 'hard']:
                 if stats_to_save[difficulty]['best_time'] == float('inf'):
-                    stats_to_save[difficulty]['best_time'] = "inf"
+                    stats_to_save[difficulty]['best_time'] = float('inf')
                 
             # Convert to JSON string and obfuscate
             json_str = json.dumps(stats_to_save)

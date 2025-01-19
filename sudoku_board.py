@@ -21,6 +21,50 @@ class SudokuBoard:
         self.__generate_board()
 
 
+    def __validate_input(self, new_value):
+        """
+        Validates that the input is a number between 1 and 9.
+        
+        Parameters:
+        new_value : str, the current value of the Entry widget after the input.
+
+        Returns:
+        bool : True if valid, False otherwise.
+        """
+        if new_value == "":  # Allow clearing the field
+            return True
+        if new_value.isdigit() and 1 <= int(new_value) <= 9:
+            return True
+        return False
+
+
+    def __create_entry(self, frame, r, c):
+        """
+        Create an entry widget with input validation.
+        
+        Parameters:
+        frame : tk.Frame, the parent frame for the Entry widget.
+        r : int, row index.
+        c : int, column index.
+
+        Returns:
+        tk.Entry : the created Entry widget.
+        """
+        # Register the validation command
+        vcmd = (self.root.register(self.__validate_input), "%P")  # "%P" is the new value of the Entry widget
+
+        entry = tk.Entry(
+            frame, 
+            width=2, 
+            font=("Arial", 18), 
+            justify="center", 
+            validate="key", 
+            validatecommand=vcmd
+        )
+        entry.grid(row=r, column=c, padx=1, pady=1)
+        return entry
+
+
     def __generate_board(self):
         """
         Function to generate a Sudoku puzzle and display it on the board.
@@ -48,9 +92,9 @@ class SudokuBoard:
                     for col in range(3):
                         # Get the r and c values as per the large sudoku
                         r, c = box_row * 3 + row, box_col * 3 + col
-                        # Create a 'Entry' for user input
-                        entry = tk.Entry(frame, width=2, font=("Arial", 18), justify="center")
-                        entry.grid(row=row, column=col, padx=1, pady=1)
+
+                        # Create a new entry
+                        entry = self.__create_entry(frame, row, col)
                         # Check if the there is a value at this place
                         if self.sudoku[r][c] != 0:
                             # If value is there, insert it and disable user input for it
@@ -58,12 +102,12 @@ class SudokuBoard:
                             entry.config(state="disabled", disabledforeground="black")
                         else:
                             # If value isn't there, then bind entry to a 'KeyRelease' to check the user input
-                            entry.bind('<KeyRelease>', lambda _, e=entry, r=r, c=c: self.__is_entry_valid(e, r, c))
+                            entry.bind('<KeyRelease>', lambda event, e=entry, r=r, c=c: self.__is_number_in_entry_valid(event, e, r, c))
                         # Add the entry to entries list
                         self.entries[r][c] = entry
 
 
-    def __is_number_valid(self, r, c, val):
+    def __is_number_safe_to_add(self, r, c, val):
         """
         Function to check if the number (value) corresponding to the row and column is valid. It checks in the row, column and same box for the same number.
 
@@ -115,7 +159,7 @@ class SudokuBoard:
         # Loop for the values
         for val in range(1, 10):
             # Check if the value is safe to add
-            if self.__is_number_valid(row, col, val):
+            if self.__is_number_safe_to_add(row, col, val):
                 # Add the value
                 self.sudoku[row][col] = val
                 # Check if the next value is safe to add
@@ -172,7 +216,7 @@ class SudokuBoard:
             self.sudoku[row][col] = 0
 
 
-    def __is_entry_valid(self, entry, row, col):
+    def __is_number_in_entry_valid(self, event, entry, row, col):
         """
         Function to update the background color of any entry based on if it's empty, correct and incorrect.
 
@@ -186,8 +230,13 @@ class SudokuBoard:
             # Change the background to white
             entry.config(bg='white')
             self.sudoku[row][col] = 0
+            return
+        elif event.char != entry.get():
+            entry.delete(0, tk.END)
+            entry.insert(0, int(event.char))
+        
         # Check if the value is not correct by comparing with the solved sudoku
-        elif int(entry.get()) != self.sudoku_solved[row][col]:
+        if int(entry.get()) != self.sudoku_solved[row][col]:
             # Change the background to red
             entry.config(bg='red')
             # Update the game mistakes
